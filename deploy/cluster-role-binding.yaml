@@ -1,0 +1,12 @@
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: list-gatekeeper
+subjects:
+- kind: ServiceAccount
+  name: gatekeeper-dashboard
+  namespace: gatekeeper-system
+roleRef:
+  kind: ClusterRole
+  name: list-gatekeeper
+  apiGroup: rbac.authorization.k8s.io

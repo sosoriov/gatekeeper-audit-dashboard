@@ -1,0 +1,43 @@
+apiVersion: apps/v1 
+kind: Deployment 
+metadata: 
+  name: gatekeeper-audit-dashboard
+spec: 
+  replicas: 1 
+  template: 
+    spec: 
+      serviceAccountName: gatekeeper-dashboard
+      containers: 
+      - name: nginx 
+        image: nginx:1.16-perl 
+        imagePullPolicy: IfNotPresent 
+        ports: 
+        - name: http 
+          containerPort: 80 
+        volumeMounts: 
+        - name: nginx-proxy-config 
+          mountPath: /etc/nginx/conf.d/default.conf 
+          subPath: nginx.conf
+      - name: gatekeeper-audit-dashboard
+        image: sosorio/gatekeeper_audit_dashboard:v:0.1.0
+        imagePullPolicy: IfNotPresent
+        env: 
+          - name: ENVIRONMENT 
+            value: cluster
+          - name: FLASK_RUN_PORT
+            value: "8050"
+          - name: DEBUG
+            value: "False"
+        ports: 
+        - name: http 
+          containerPort: 8050
+        volumeMounts:
+          - name: app-config
+            mountPath: /config
+      volumes: 
+      - name: nginx-proxy-config 
+        configMap: 
+          name: nginx.conf
+      - name: app-config
+        configMap:
+          name: dashboardconfig
